@@ -71,24 +71,29 @@ async function onMessage(msg) {
   const isText = msg.type() === bot.Message.Type.Text // 消息类型是否为文本
   // TODO 你们可以根据自己的需求修改这里的逻辑
   if (isText && content) {
+    const { id: contactId } = contact;
     let notification = `发送“${botName}【问题】”可开启chatgpt智能会话，例如“${botName} 老婆和我妈同时掉河里，先救谁？”`
     const callChat = content.includes(`${botName}`) // 艾特了机器人
     try {
       // 区分群聊和私聊
       if (callChat) {
-        if(content == notification || content.includes("[chatgpt response]")){
+        if(content.includes(notification) || content.includes("[chatgpt response]")){
           return 
         }
 
         let contentString = content.replace(`${botName}`, '').trim()
+        let contentObj = {
+          content: contentString,
+          contactId
+        }
         if(room){
-          await room.say(pre + await getReply(contentString))
+          await room.say(pre + await getReply(contentObj))
           return
         } else {
           if(!chatMap.has(name)){
             chatMap.set(name, new Date().getTime())
           }
-          await contact.say(pre + await getReply(contentString))
+          await contact.say(pre + await getReply(contentObj))
         }
       } else {
         let nowTime = new Date().getTime()
