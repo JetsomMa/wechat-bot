@@ -1,6 +1,7 @@
 import { WechatyBuilder, ScanStatus } from 'wechaty'
 import qrTerminal from 'qrcode-terminal'
-import { getOpenAiReply as getReply } from '../openai/index.js'
+import { getChatGPTReply } from '../chatgpt/index.js'
+import { getOpenAiReply } from '../openai/index.js'
 import { botName } from '../../config.js'
 
 let bot = {};
@@ -60,6 +61,7 @@ async function onMessage(msg) {
   const contact = msg.talker() // 发消息人
   if (msg.self()) {
     contactSelf = contact
+    await contact.say("我收到消息了")
   }
 
   const receiver = msg.to() // 消息接收人
@@ -87,13 +89,21 @@ async function onMessage(msg) {
           contactId
         }
         if(room){
-          await room.say(pre + await getReply(contentObj))
+          if(content.includes(`${botName}gpt`)){
+            await room.say(pre + await getChatGPTReply(contentObj))
+          } else {
+            await room.say(pre + await getOpenAiReply(contentObj))
+          }
           return
         } else {
           if(!chatMap.has(name)){
             chatMap.set(name, new Date().getTime())
           }
-          await contact.say(pre + await getReply(contentObj))
+          if(content.includes(`${botName}gpt`)){
+            await contact.say(pre + await getChatGPTReply(contentObj))
+          } else {
+            await contact.say(pre + await getOpenAiReply(contentObj))
+          }
         }
       } else {
         let nowTime = new Date().getTime()
