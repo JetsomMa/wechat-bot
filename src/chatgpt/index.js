@@ -5,7 +5,8 @@ const env = dotenv.config().parsed // 环境参数
 
 let chatOption = {};
 const chatGPT = new ChatGPTUnofficialProxyAPI({
-  accessToken: env.OPENAI_ACCESS_TOKEN
+  accessToken: env.OPENAI_ACCESS_TOKEN,
+  apiReverseProxyUrl: 'https://chat.duti.tech/api/conversation'
 })
 
 export async function getChatGPTReply({content, contactId}) {
@@ -17,7 +18,8 @@ export async function getChatGPTReply({content, contactId}) {
       parentMessageId: chatOption.parentMessageId
     }),
     {
-      text: content
+      text: content,
+      timeoutMs: 1000 * 60 * 10
     }
   )
 
