@@ -6,7 +6,7 @@ const env = dotenv.config().parsed // 环境参数
 let chatOption = {};
 const chatGPT = new ChatGPTUnofficialProxyAPI({
   accessToken: env.OPENAI_ACCESS_TOKEN,
-  apiReverseProxyUrl: 'https://gpt.pawan.krd/backend-api/conversation'
+  // apiReverseProxyUrl: 'https://gpt.pawan.krd/backend-api/conversation'
 })
 
 export async function getChatGPTReply({content, contactId}) {
