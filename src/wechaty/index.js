@@ -47,7 +47,7 @@ async function onFriendShip(friendship) {
  * @param isSharding
  * @returns {Promise<void>}
  */
-const pre = `[旺柴][chatgpt response][旺柴] \n`
+const pre = `[旺柴][chatgpt response][旺柴] \n request \n ---------------- \n`
 const chatMap = new Map()
 const startTime = new Date().getTime();
 let contactSelf = {}
@@ -61,7 +61,6 @@ async function onMessage(msg) {
   const contact = msg.talker() // 发消息人
   if (msg.self()) {
     contactSelf = contact
-    await contact.say("我收到消息了")
   }
 
   const receiver = msg.to() // 消息接收人
@@ -74,8 +73,9 @@ async function onMessage(msg) {
   // TODO 你们可以根据自己的需求修改这里的逻辑
   if (isText && content) {
     const { id: contactId } = contact;
-    let notification = `发送“${botName}【问题】”可开启chatgpt智能会话，例如“${botName} 老婆和我妈同时掉河里，先救谁？”`
+    let notification = `发送“${botName}或${botName}gpt【问题】”可开启chatgpt智能会话，例如“${botName} 老婆和我妈同时掉河里，先救谁？”`
     const callChat = content.includes(`${botName}`) // 艾特了机器人
+
     try {
       // 区分群聊和私聊
       if (callChat) {
@@ -90,19 +90,22 @@ async function onMessage(msg) {
         }
         if(room){
           if(content.includes(`${botName}gpt`)){
-            await room.say(pre + await getChatGPTReply(contentObj))
+            await room.say("ChatGPT消息处理中，请耐心等待...")
+            await room.say(pre.replace("request", contentString) + markdownToText(await getChatGPTReply(contentObj)))
           } else {
-            await room.say(pre + await getOpenAiReply(contentObj))
+            await room.say(pre.replace("chatgpt", "openai").replace("request", contentString) + markdownToText(await getOpenAiReply(contentObj)))
           }
           return
         } else {
           if(!chatMap.has(name)){
             chatMap.set(name, new Date().getTime())
           }
+          
           if(content.includes(`${botName}gpt`)){
-            await contact.say(pre + await getChatGPTReply(contentObj))
+            await contact.say("ChatGPT消息处理中，请耐心等待...")
+            await contact.say(pre.replace("request", contentString) + markdownToText(await getChatGPTReply(contentObj)))
           } else {
-            await contact.say(pre + await getOpenAiReply(contentObj))
+            await contact.say(pre.replace("chatgpt", "openai").replace("request", contentString) + markdownToText(await getOpenAiReply(contentObj)))
           }
         }
       } else {
@@ -153,4 +156,8 @@ async function initProject() {
     .start()
     .then(() => console.log('Start to log in wechat...'))
     .catch((e) => console.error(e))
+}
+
+function markdownToText(text) {
+  return text.replace(/\</mg, "&lt;").replace(/\>/mg, "&gt;")
 }
