@@ -125,6 +125,7 @@ async function onMessage(msg) {
       }
     } catch (e) {
       console.error(e)
+      contactSelf.say("请求发生异常：" + JSON.stringify(e))
     }
   }
 }
