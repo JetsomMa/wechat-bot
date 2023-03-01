@@ -83,7 +83,7 @@ async function onMessage(msg) {
           return 
         }
 
-        let contentString = content.replace(`${botName}`, '').trim()
+        let contentString = content.replace(`${botName}gpt`, '').replace(`${botName}`, '').trim()
         let contentObj = {
           content: contentString,
           contactId
