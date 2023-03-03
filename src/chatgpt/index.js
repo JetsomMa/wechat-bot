@@ -5,7 +5,7 @@ const env = dotenv.config().parsed // 环境参数
 
 let chatOption = {};
 const chatGPT = new ChatGPTUnofficialProxyAPI({
-  apiReverseProxyUrl: 'https://freechatgpt.lol/backend-api/conversation',
+  // apiReverseProxyUrl: 'https://freechatgpt.lol/backend-api/conversation',
   accessToken: env.OPENAI_ACCESS_TOKEN
 })
 
