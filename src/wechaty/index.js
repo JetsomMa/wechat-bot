@@ -47,7 +47,7 @@ async function onFriendShip(friendship) {
  * @param isSharding
  * @returns {Promise<void>}
  */
-const pre = `[旺柴][chatgpt response][旺柴] \n request \n ---------------- \n`
+const pre = `[旺柴][chatgpt response][旺柴] count 字符 \n request \n ---------------- \n`
 const chatMap = new Map()
 const startTime = new Date().getTime();
 let contactSelf = {}
@@ -91,9 +91,11 @@ async function onMessage(msg) {
         if(room){
           if(content.includes(`${botName}gpt`)){
             await room.say("ChatGPT消息处理中，请耐心等待...")
-            await room.say(pre.replace("request", contentString) + markdownToText(await getChatGPTReply(contentObj)))
+            let response = markdownToText(await getChatGPTReply(contentObj))
+            await room.say(pre.replace("request", contentString).replace("count", calculateStringLength(response)) + response)
           } else {
-            await room.say(pre.replace("chatgpt", "openai").replace("request", contentString) + markdownToText(await getOpenAiReply(contentObj)))
+            let response = markdownToText(await getOpenAiReply(contentObj))
+            await room.say(pre.replace("chatgpt", "openai").replace("request", contentString).replace("count", calculateStringLength(response)) + response)
           }
           return
         } else {
@@ -103,9 +105,11 @@ async function onMessage(msg) {
           
           if(content.includes(`${botName}gpt`)){
             await contact.say("ChatGPT消息处理中，请耐心等待...")
-            await contact.say(pre.replace("request", contentString) + markdownToText(await getChatGPTReply(contentObj)))
+            let response = markdownToText(await getChatGPTReply(contentObj))
+            await contact.say(pre.replace("request", contentString).replace("count", calculateStringLength(response)) + response)
           } else {
-            await contact.say(pre.replace("chatgpt", "openai").replace("request", contentString) + markdownToText(await getOpenAiReply(contentObj)))
+            let response = markdownToText(await getOpenAiReply(contentObj))
+            await contact.say(pre.replace("chatgpt", "openai").replace("request", contentString).replace("count", calculateStringLength(response)) + response)
           }
         }
       } else {
@@ -161,4 +165,13 @@ async function initProject() {
 
 function markdownToText(text) {
   return text.replace(/\</mg, "&lt;").replace(/\>/mg, "&gt;")
+}
+
+function calculateStringLength(str) {
+  let length = 0;
+  for (let i = 0; i < str.length; i++) {
+    const charCode = str.codePointAt(i);
+    length += charCode > 0xFFFF ? 2 : 1; // 一个汉字的字符编码大于 0xFFFF
+  }
+  return length;
 }
